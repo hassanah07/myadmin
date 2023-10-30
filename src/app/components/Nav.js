@@ -1,8 +1,8 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { GiHamburgerMenu } from "react-icons/Gi";
-import { AiOutlineCloseCircle } from "react-icons/Ai";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { AiOutlineCloseCircle } from "react-icons/ai";
 import Image from "next/image";
 import { nav } from "../api/Nav";
 import { AdminNav } from "../api/AdminNav";
@@ -138,6 +138,9 @@ const Nav = () => {
           </div>
         </div>
       )}
+      <div className="fixed bottom-6 right-4 z-20 cursor-pointer dark:border-white border-2 border-black rounded-lg">
+        <ModeToggle />
+      </div>
     </>
   );
 };

@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import Nav from "./components/Nav";
+import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -13,9 +14,16 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body className="bg-purple-300 min-h-screen">
+      <body className="dark:bg-black bg-white">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
         <Nav key={key}/>
-        {children}
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
