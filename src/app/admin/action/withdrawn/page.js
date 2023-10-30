@@ -1,0 +1,95 @@
+"use client";
+import Quicklink from "../../../components/Quicklink";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import BlogAction from "@/app/components/BlogAction";
+
+const Page = ({ searchParams }) => {
+  const { push } = useRouter();
+  const [blogs, setBlogs] = useState([]);
+  const [pageNumbers, setPageNumbers] = useState([]);
+  const dataLimit = 6;
+
+  let currentPage = 1;
+
+  if (Number(searchParams.page) >= 1) {
+    currentPage = Number(searchParams.page);
+  }
+  // console.log(currentPage);
+  // let offset = (currentPage - 1) * dataLimit;
+  const fetchData = async () => {
+    const payload = { currentpage: currentPage, datalimit: dataLimit };
+    const url = `${process.env.NEXT_PUBLIC_HOST}/api/admin/deleteblogs?currentpage=${currentPage}&datalimit=${dataLimit}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token": localStorage.getItem("adminToken")
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+
+    setBlogs(data.blogposts);
+    const totalData = data.totalItems;
+    const totalPages = Math.ceil(totalData / dataLimit);
+    let page = [];
+    for (let i = currentPage - 3; i <= currentPage + 3; i++) {
+      if (i < 1) continue;
+      if (i > totalPages) break;
+      page.push(i);
+      setPageNumbers(page);
+    }
+  };
+  const tokenVerify = async () => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      push("/");
+    } else {
+      let res = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST}/api/admin/tokenverify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": localStorage.getItem("adminToken")
+          },
+          body: JSON.stringify()
+        }
+      );
+      res = await res.json();
+      if (res == false) {
+        localStorage.removeItem("adminToken");
+        push("/");
+      }
+    }
+  };
+
+  const nameOne = "dashboard";
+  const linkOne = `${process.env.NEXT_PUBLIC_FRONTEND_LINK}/admin/dashboard`;
+  const nameTwo = "link";
+  const linkTwo = `${process.env.NEXT_PUBLIC_FRONTEND_LINK}/admin/link`;
+  const nameThree = "withdrawn";
+  const linkThree = `${process.env.NEXT_PUBLIC_FRONTEND_LINK}/admin/action/withdrawn`;
+  const myPage = "withdrawn";
+  useEffect(() => {
+    fetchData();
+    tokenVerify();
+  }, []);
+
+  return (
+    <>
+      <Quicklink
+        linkOne={linkOne}
+        linkTwo={linkTwo}
+        linkThree={linkThree}
+        nameOne={nameOne}
+        nameTwo={nameTwo}
+        nameThree={nameThree}
+      />
+      <BlogAction blogs={blogs} pageNumbers={pageNumbers} myPage={myPage} />
+    </>
+  );
+};
+
+export default Page;
